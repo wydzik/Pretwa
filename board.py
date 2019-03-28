@@ -4,7 +4,7 @@ import cv2
 
 pygame.init()
 
-img = cv2.imread('PretwaOpening.jpg',0)
+img = cv2.imread('PretwaBoard.png',0)
 height, width = img.shape[:2]
 resolution = (height,width)
 screen = pygame.display.set_mode(resolution)  # Tutaj odpalamy okno
@@ -22,6 +22,6 @@ while True:
         elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
             sys.exit(0)
 
-    background_image = pygame.image.load("PretwaOpening.jpg").convert()
+    background_image = pygame.image.load("PretwaBoard.png").convert()
     pygame.display.flip()  # wyświetla to, co narysowaliśmy
     screen.blit(background_image, [0, 0])
