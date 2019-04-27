@@ -16,27 +16,16 @@ def get_image(path):
 
     return image
 
+red=get_image('Pionek_czerwony.png')
+green=get_image('Pionek_zielony.png')
+
 def draw_pawns():
-        red=get_image('Pionek_czerwony.png')
-        green=get_image('Pionek_zielony.png')
-        screen.blit(red, (game.coordinates[1]))
-        screen.blit(red, (game.coordinates[2]))
-        screen.blit(red, (game.coordinates[3]))
-        screen.blit(red, (game.coordinates[7]))
-        screen.blit(red, (game.coordinates[8]))
-        screen.blit(red, (game.coordinates[9]))
-        screen.blit(red, (game.coordinates[13]))
-        screen.blit(red, (game.coordinates[14]))
-        screen.blit(red, (game.coordinates[15]))
-        screen.blit(green, (game.coordinates[4]))
-        screen.blit(green, (game.coordinates[5]))
-        screen.blit(green, (game.coordinates[6]))
-        screen.blit(green, (game.coordinates[10]))
-        screen.blit(green, (game.coordinates[11]))
-        screen.blit(green, (game.coordinates[12]))
-        screen.blit(green, (game.coordinates[16]))
-        screen.blit(green, (game.coordinates[17]))
-        screen.blit(green, (game.coordinates[18]))
+
+        for i in range(1,20,1):
+            if game.board_state[i]==State.RED:
+                screen.blit(red, (game.coordinates[i]))
+            elif game.board_state[i]==State.GREEN:
+                screen.blit(green, (game.coordinates[i]))
 
 game=Game()
 img = cv2.imread('PretwaBoard.png',0)
@@ -63,7 +52,15 @@ while True:
         #     pos = pygame.mouse.get_pos()
         elif event.type ==pygame.MOUSEBUTTONDOWN:
             print('Mouse position: {}'.format(event.pos))
-            print('Position on board: {}'.format(game.check_if_clickable(event.pos)))
+            object_index = game.check_if_clickable(event.pos)
+            if (object_index != None):
+                print('Position on board: {}'.format(object_index))
+                screen.blit(red, (game.coordinates[2]))
+
+                game.add_to_interaction(object_index)
+                print("Positions: {}".format(game.interaction))
+                draw_pawns()
+
     background_image = pygame.image.load("PretwaBoard.png").convert()
     draw_pawns()
 

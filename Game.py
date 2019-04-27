@@ -29,6 +29,8 @@ class Game():
             18: (190, 225),
             19: (275, 275)}
 
+        self.interaction=[] #tablica dwuelementowa, 1 element- wybrany pion na planszy, 2 obiekt- puste pole
+
 
         self.board_state={  #stan pola na planszy: 3 mozliwosci (RED, GREEN, EMPTY)
             1: State.RED,
@@ -51,6 +53,7 @@ class Game():
             18: State.GREEN,
             19: State.EMPTY}
 
+
     def check_if_clickable(self,mouse_pos): #zwraca nr pola, ktore kliknal user
         for i in range(1,20,1):
             x_min=self.coordinates[i][0]
@@ -61,6 +64,19 @@ class Game():
             # print(mouse_pos)
             if (mouse_pos[0]>=x_min) and (mouse_pos[0]<=x_max) and (mouse_pos[1]>=y_min) and (mouse_pos[1]<=y_max):
                 return i
+
+    def add_to_interaction(self,pos):
+        if (len(self.interaction))==0 and self.board_state[pos]!=State.EMPTY: #pierwsze klikniete pole przez usera nie moze byc puste
+            self.interaction.append(pos)
+        elif (len(self.interaction)) == 1 and self.board_state[pos] != State.EMPTY:
+            self.interaction.clear()
+        elif (len(self.interaction)) == 1 and self.board_state[pos]==State.EMPTY:
+            self.interaction.append(pos)
+            self.board_state[self.interaction[1]] = self.board_state[self.interaction[0]]
+            self.board_state[self.interaction[0]] = State.EMPTY
+            # draw_pawns()
+            self.interaction.clear()
+
 
 
 
