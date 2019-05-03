@@ -37,9 +37,6 @@ tps_clock = pygame.time.Clock()
 tps_delta = 0.0
 tps_max=40.0
 
-#pozycje w których powinny być umieszczone pionki
-
-
 while True:
     for event in pygame.event.get():  # przechwytuje jakieś zdarzenia, tylko trzeba rozróżnić że
                                          # np. każde kliknięcie to osobny event
