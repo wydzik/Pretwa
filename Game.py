@@ -52,6 +52,7 @@ class Game():
             19: State.EMPTY}
 
         self.red_turn = True
+        self.go_deeper = True
 
         self.can_move_to= {
             1: [2,6,7],
@@ -114,14 +115,40 @@ class Game():
             if (mouse_pos[0]>=x_min) and (mouse_pos[0]<=x_max) and (mouse_pos[1]>=y_min) and (mouse_pos[1]<=y_max):
                 return i
 
-    def add_to_interaction(self,pos):
-        if self.red_turn==True:
+    def check_hits(self,my_state,oponent_state):
+        for x in self.board_state:
 
+            if self.board_state[x] == my_state:
 
-            if False:
-                pass
+                for y in self.can_hit[x]:
 
-            elif (len(self.interaction))==0 and self.board_state[pos]==State.RED: #pierwsze klikniete pole przez usera nie moze byc puste
+                    if self.board_state[y] == State.EMPTY:
+
+                        next_step = y
+                        position = x
+                        hit = self.has_common(self.can_move_to[position], self.can_move_to[next_step])
+
+                        if self.board_state[hit] == oponent_state:
+                            self.board_state[hit] = State.EMPTY
+                            self.board_state[next_step] = self.board_state[position]
+                            self.board_state[position] = State.EMPTY
+                            self.go_deeper = False
+            if self.go_deeper == False:
+                self.go_deeper=True
+                self.red_turn = not self.red_turn
+                break
+        return False
+
+    def add_to_interaction(self, pos):
+
+        if self.red_turn:
+
+            check = True
+            while check:
+                if not self.check_hits(State.RED, State.GREEN):
+                    check = False
+
+            if (len(self.interaction)) == 0 and self.board_state[pos] == State.RED: #pierwsze klikniete pole przez usera nie moze byc puste
 
                 self.interaction.append(pos)
 
@@ -129,7 +156,7 @@ class Game():
 
                 self.interaction.clear()
 
-            elif (len(self.interaction)) == 1 and self.board_state[pos]==State.EMPTY:
+            elif (len(self.interaction)) == 1 and self.board_state[pos] == State.EMPTY:
 
                 self.interaction.append(pos)
 
@@ -137,15 +164,16 @@ class Game():
 
                     self.board_state[self.interaction[1]] = self.board_state[self.interaction[0]]
                     self.board_state[self.interaction[0]] = State.EMPTY
-                    self.red_turn=False
+                    self.red_turn = False
                     # draw_pawns()
                     self.interaction.clear()
 
                 elif (self.interaction[1] not in self.can_move_to[self.interaction[0]])\
                         and ((self.interaction[1] in self.can_hit[self.interaction[0]])
-                             and (self.board_state[self.has_common(self.can_move_to[self.interaction[0]], self.can_move_to[self.interaction[1]])]==State.GREEN)):
+                             and (self.board_state[self.has_common(self.can_move_to[self.interaction[0]],
+                                                                   self.can_move_to[self.interaction[1]])] == State.GREEN)):
 
-                    x=self.has_common(self.can_move_to[self.interaction[0]],self.can_move_to[self.interaction[1]])
+                    x=self.has_common(self.can_move_to[self.interaction[0]], self.can_move_to[self.interaction[1]])
                     self.board_state[x] = State.EMPTY
                     self.board_state[self.interaction[1]] = self.board_state[self.interaction[0]]
                     self.board_state[self.interaction[0]] = State.EMPTY
@@ -157,16 +185,21 @@ class Game():
                     self.interaction.clear()
                 counter=0
                 for x in self.board_state:
-                    if self.board_state[x]==State.GREEN:
-                        counter+=1
+                    if self.board_state[x] == State.GREEN:
+                        counter += 1
                 if counter <= 3:
                     print("Red wins")
+                self.go_deeper = True
                 print("Green turn")
 
+        elif not self.red_turn:
 
-        elif self.red_turn==False:
+            check = True
+            while check:
+                if not self.check_hits(State.GREEN, State.RED):
+                    check = False
 
-            if (len(self.interaction))==0 and self.board_state[pos]==State.GREEN: #pierwsze klikniete pole przez usera nie moze byc puste
+            if (len(self.interaction)) == 0 and self.board_state[pos] == State.GREEN: #pierwsze klikniete pole przez usera nie moze byc puste
 
                 self.interaction.append(pos)
 
@@ -174,7 +207,7 @@ class Game():
 
                 self.interaction.clear()
 
-            elif (len(self.interaction)) == 1 and self.board_state[pos]==State.EMPTY:
+            elif (len(self.interaction)) == 1 and self.board_state[pos] == State.EMPTY:
 
                 self.interaction.append(pos)
 
@@ -188,7 +221,8 @@ class Game():
 
                 elif (self.interaction[1] not in self.can_move_to[self.interaction[0]]) \
                         and (self.interaction[1] in self.can_hit[self.interaction[0]])\
-                        and (self.board_state[self.has_common(self.can_move_to[self.interaction[0]], self.can_move_to[self.interaction[1]])]==State.RED):
+                        and (self.board_state[self.has_common(self.can_move_to[self.interaction[0]],
+                                                              self.can_move_to[self.interaction[1]])] == State.RED):
 
                     x = self.has_common(self.can_move_to[self.interaction[0]], self.can_move_to[self.interaction[1]])
                     self.board_state[x] = State.EMPTY
