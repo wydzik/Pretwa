@@ -6,6 +6,7 @@ from Game import *
 pygame.init()
 _image_library = {}
 
+
 def get_image(path):
     global _image_library
     image = _image_library.get(path)
@@ -16,26 +17,29 @@ def get_image(path):
 
     return image
 
-red=get_image('Pionek_czerwony.png')
-green=get_image('Pionek_zielony.png')
+
+red = get_image('Pionek_czerwony.png')
+green = get_image('Pionek_zielony.png')
+
 
 def draw_pawns():
 
-        for i in range(1,20,1):
-            if game.board_state[i]==State.RED:
+        for i in range(1, 20, 1):
+            if game.board_state[i] == State.RED:
                 screen.blit(red, (game.coordinates[i]))
-            elif game.board_state[i]==State.GREEN:
+            elif game.board_state[i] == State.GREEN:
                 screen.blit(green, (game.coordinates[i]))
 
-game=Game()
-img = cv2.imread('PretwaBoard.png',0)
+
+game = Game()
+img = cv2.imread('PretwaBoard.png', 0)
 height, width = img.shape[:2]
-resolution = (height,width)
+resolution = (height, width)
 screen = pygame.display.set_mode(resolution)  # Tutaj odpalamy okno
 pygame.display.set_caption("Pretwa - The game")  # Ustalamy co wyświetli się na pasku
 tps_clock = pygame.time.Clock()
 tps_delta = 0.0
-tps_max=40.0
+tps_max = 40.0
 
 while True:
     for event in pygame.event.get():  # przechwytuje jakieś zdarzenia, tylko trzeba rozróżnić że
@@ -50,7 +54,7 @@ while True:
         elif event.type ==pygame.MOUSEBUTTONDOWN:
             print('Mouse position: {}'.format(event.pos))
             object_index = game.check_if_clickable(event.pos)
-            if (object_index != None):
+            if object_index != None:
                 print('Position on board: {}'.format(object_index))
                 screen.blit(red, (game.coordinates[2]))
 
