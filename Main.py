@@ -2,6 +2,7 @@ import pygame, sys
 import cv2
 import os
 from Game import *
+from Game_with_computer import *
 
 pygame.init()
 _image_library = {}
