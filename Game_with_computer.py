@@ -1,11 +1,4 @@
-from enum import Enum
-
-
-class State(Enum):
-    RED = 'red'
-    GREEN = 'green'
-    EMPTY = 'empty'
-
+from Game import State
 
 class Game_with_computer():
     def __init__(self):
@@ -56,6 +49,7 @@ class Game_with_computer():
 
         self.red_turn = True
         self.go_deeper = True
+
 
         self.can_move_to = {
             1: [2, 6, 7],
