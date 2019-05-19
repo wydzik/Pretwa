@@ -21,7 +21,6 @@ def get_image(path):
 red = get_image('Pionek_czerwony.png')
 green = get_image('Pionek_zielony.png')
 
-
 def draw_pawns():
 
         for i in range(1, 20, 1):
@@ -32,9 +31,10 @@ def draw_pawns():
 
 
 game = Game()
-img = cv2.imread('PretwaBoard.png', 0)
+img = cv2.imread('Pretwa_menu.png', 0)
+in_menu = True
 height, width = img.shape[:2]
-resolution = (height, width)
+resolution = (width, height)
 screen = pygame.display.set_mode(resolution)  # Tutaj odpalamy okno
 pygame.display.set_caption("Pretwa - The game")  # Ustalamy co wyświetli się na pasku
 tps_clock = pygame.time.Clock()
@@ -42,28 +42,70 @@ tps_delta = 0.0
 tps_max = 40.0
 
 while True:
-    for event in pygame.event.get():  # przechwytuje jakieś zdarzenia, tylko trzeba rozróżnić że
-                                         # np. każde kliknięcie to osobny event
+    if in_menu:
+        background_image = pygame.image.load("Pretwa_menu.png").convert()
+        for event in pygame.event.get():  # przechwytuje jakieś zdarzenia, tylko trzeba rozróżnić że
+                                            # np. każde kliknięcie to osobny event
                                             # ale kliknięcie i trzymanie to już tylko jeden event
-        if event.type == pygame.QUIT:  # sprawdza, czy tym zdarzeniem było kliknięcie X
-            sys.exit(0)                 # jeżeli tak, to wyłącza okienko
-        elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-            sys.exit(0)
-        # elif event.type == pygame.MOUSEBUTTONUP:
-        #     pos = pygame.mouse.get_pos()
-        elif event.type ==pygame.MOUSEBUTTONDOWN:
-            print('Mouse position: {}'.format(event.pos))
-            object_index = game.check_if_clickable(event.pos)
-            if object_index != None:
-                print('Position on board: {}'.format(object_index))
-                screen.blit(red, (game.coordinates[2]))
 
-                game.add_to_interaction(object_index)
-                print("Positions: {}".format(game.interaction))
-                draw_pawns()
+            if event.type == pygame.QUIT:  # sprawdza, czy tym zdarzeniem było kliknięcie X
+                sys.exit(0)  # jeżeli tak, to wyłącza okienko
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                sys.exit(0)
 
-    background_image = pygame.image.load("PretwaBoard.png").convert()
-    draw_pawns()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                print('Mouse position: {}'.format(event.pos))
+                if (event.pos[0] >= 100)\
+                        and (event.pos[0] <= 500)\
+                        and (event.pos[1] >= 250)\
+                        and (event.pos[1] <= 350):
+                   in_menu = False
+                   background_image = pygame.image.load("PretwaBoard.png").convert()
+
+                elif (event.pos[0] >= 100)\
+                        and (event.pos[0] <= 500)\
+                        and (event.pos[1] >= 400)\
+                        and (event.pos[1] <= 500):
+                    pass
+
+    elif (in_menu == False) and (game.red_wins == False and game.green_wins ==False) :
+        for event in pygame.event.get():  # przechwytuje jakieś zdarzenia, tylko trzeba rozróżnić że
+                                             # np. każde kliknięcie to osobny event
+                                                # ale kliknięcie i trzymanie to już tylko jeden event
+            if event.type == pygame.QUIT:  # sprawdza, czy tym zdarzeniem było kliknięcie X
+                sys.exit(0)                 # jeżeli tak, to wyłącza okienko
+
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                sys.exit(0)
+
+            elif event.type ==pygame.MOUSEBUTTONDOWN:
+                print('Mouse position: {}'.format(event.pos))
+                object_index = game.check_if_clickable(event.pos)
+
+                if object_index != None:
+                    print('Position on board: {}'.format(object_index))
+                    screen.blit(red, (game.coordinates[2]))
+
+                    game.add_to_interaction(object_index)
+                    print("Positions: {}".format(game.interaction))
+                    draw_pawns()
+
+        if game.red_turn:
+            background_image = pygame.image.load("Pretwa_red_turn.png").convert()
+            draw_pawns()
+
+        elif not game.red_turn:
+            background_image = pygame.image.load("Pretwa_green_turn.png").convert()
+            draw_pawns()
+    else:
+
+        if game.green_wins:
+            background_image = pygame.image.load("Pretwa_green_wins.png").convert()
+
+        if game.red_wins:
+            background_image = pygame.image.load("Pretwa_red_wins.png").convert()
+
+
 
     pygame.display.flip()  # wyświetla to, co narysowaliśmy
 

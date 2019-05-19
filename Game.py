@@ -56,6 +56,8 @@ class Game():
 
         self.red_turn = True
         self.go_deeper = True
+        self.red_wins = False
+        self.green_wins = False
 
         self.can_move_to = {
             1: [2, 6, 7],
@@ -101,6 +103,7 @@ class Game():
         }
 
     def has_common(self, a, b):
+        """sprawdzamy czy dwie listy mają wspólny element"""
         for x in a:
             for y in b:
                 if x == y:
@@ -222,7 +225,7 @@ class Game():
                     if self.board_state[x] == State.GREEN:
                         counter += 1
                 if counter <= 3:
-                    print("Red wins")
+                    self.red_turn=True
 
         elif not self.red_turn:
 
@@ -259,7 +262,7 @@ class Game():
                         else:
                             self.red_turn = True
                             self.interaction.clear()
-                            print("Green turn")
+                            print("Red turn")
                     else:
                         self.interaction.clear()
                 else:
@@ -269,7 +272,7 @@ class Game():
                         self.board_state[self.interaction[0]] = State.EMPTY
                         self.red_turn = True
                         self.interaction.clear()
-                        print("Green turn")
+                        print("Red turn")
 
                     elif (self.interaction[1] not in self.can_move_to[self.interaction[0]]) \
                             and ((self.interaction[1] in self.can_hit[self.interaction[0]])
@@ -287,7 +290,7 @@ class Game():
                         else:
                             self.red_turn = True
                             self.interaction.clear()
-                            print("Green turn")
+                            print("Red turn")
                     else:
                         self.interaction.clear()
                 counter = 0
@@ -295,5 +298,4 @@ class Game():
                     if self.board_state[x] == State.RED:
                         counter += 1
                 if counter <= 3:
-                    print("Red wins")
-
+                    self.green_wins = True
