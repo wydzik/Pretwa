@@ -110,7 +110,10 @@ while True:
         elif not game.red_turn:
             background_image = pygame.image.load("Pretwa_green_turn.png").convert()
             draw_pawns()
-    elif (in_menu == False) and (game.red_wins == False and game.green_wins == False) and (with_player == False):
+    elif (in_menu == False)\
+            and (game_with_computer.red_wins == False)\
+            and (game_with_computer.green_wins == False)\
+            and (with_player == False):
         for event in pygame.event.get():  # przechwytuje jakieś zdarzenia, tylko trzeba rozróżnić że
             # np. każde kliknięcie to osobny event
             # ale kliknięcie i trzymanie to już tylko jeden event
@@ -141,7 +144,7 @@ while True:
             draw_pawns_pvc()
     else:
 
-        if game.green_wins:
+        if game.green_wins or game_with_computer.green_wins:
             background_image = pygame.image.load("Pretwa_green_wins.png").convert()
             for event in pygame.event.get():  # przechwytuje jakieś zdarzenia, tylko trzeba rozróżnić że
                 # np. każde kliknięcie to osobny event
@@ -152,7 +155,7 @@ while True:
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                     sys.exit(0)
 
-        if game.red_wins:
+        if game.red_wins or game_with_computer.red_wins:
             background_image = pygame.image.load("Pretwa_red_wins.png").convert()
             for event in pygame.event.get():  # przechwytuje jakieś zdarzenia, tylko trzeba rozróżnić że
                 # np. każde kliknięcie to osobny event

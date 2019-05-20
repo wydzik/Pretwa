@@ -49,7 +49,8 @@ class Game_with_computer():
 
         self.red_turn = True
         self.go_deeper = True
-
+        self.red_wins = False
+        self.green_wins = False
 
         self.can_move_to = {
             1: [2, 6, 7],
@@ -182,7 +183,7 @@ class Game_with_computer():
             elif (len(self.interaction)) == 1 and self.board_state[pos] == State.EMPTY:  # prawidłowy ruch
 
                 self.interaction.append(pos)
-                if self.check_any_hits(State.RED,State.GREEN):
+                if self.check_any_hits(State.RED, State.GREEN):
 
                     if self.interaction[1] in self.can_move_to[self.interaction[0]]:  # ruch bez bicia
 
@@ -239,10 +240,16 @@ class Game_with_computer():
                     if self.board_state[x] == State.GREEN:
                         counter += 1
                 if counter <= 3:
-                    print("Red wins")
+                    self.red_wins = True
 
         elif not self.red_turn: #computer - green
             self.computer_move()
+            counter = 0
+            for x in self.board_state:
+                if self.board_state[x] == State.RED:
+                    counter += 1
+            if counter <= 3:
+                self.green_wins = True
 
     def computer_move(self):
         computer_pawns=[]
