@@ -168,6 +168,38 @@ class Game_with_computer():
                             list_full.append(list)
         return list_full
 
+    def check_win(self, checked_state):
+        counter = 0
+        for x in self.board_state:
+            if self.board_state[x] == checked_state:
+                counter += 1
+        if counter <= 3:
+            return True
+        elif counter > 3:
+            return False
+
+    def check_win(self, checked_state):
+        counter = 0
+        for x in self.board_state:
+            if self.board_state[x] == checked_state:
+                counter += 1
+        if counter <= 3:
+            return True
+        elif counter > 3:
+            return False
+
+    def make_hit(self):
+        hit_pawn = self.has_common(self.can_move_to[self.interaction[0]], self.can_move_to[self.interaction[1]])
+        self.board_state[hit_pawn] = State.EMPTY
+        self.board_state[self.interaction[1]] = self.board_state[self.interaction[0]]
+        self.board_state[self.interaction[0]] = State.EMPTY
+
+    def make_move(self):
+        self.board_state[self.interaction[1]] = self.board_state[self.interaction[0]]
+        self.board_state[self.interaction[0]] = State.EMPTY
+        self.red_turn = not self.red_turn
+        self.interaction.clear()
+
     def add_to_interaction(self, pos):
 
         if self.red_turn:
@@ -194,61 +226,39 @@ class Game_with_computer():
                                  and (self.board_state[self.has_common(self.can_move_to[self.interaction[0]],
                                                                        self.can_move_to[self.interaction[1]])] == State.GREEN)):
 
-                        x = self.has_common(self.can_move_to[self.interaction[0]], self.can_move_to[self.interaction[1]])
-                        self.board_state[x] = State.EMPTY
-                        self.board_state[self.interaction[1]] = self.board_state[self.interaction[0]]
-                        self.board_state[self.interaction[0]] = State.EMPTY
+                        self.make_hit()
+
                         if self.check_pawn_hits(State.RED,State.GREEN,self.interaction[1]):
                             self.interaction.clear()
                         else:
                             self.red_turn = False
                             self.interaction.clear()
-                            print("Green turn")
                     else:
                         self.interaction.clear()
                 else:
                     if self.interaction[1] in self.can_move_to[self.interaction[0]]:  # ruch bez bicia
 
-                        self.board_state[self.interaction[1]] = self.board_state[self.interaction[0]]
-                        self.board_state[self.interaction[0]] = State.EMPTY
-                        self.red_turn = False
-                        self.interaction.clear()
-                        print("Green turn")
+                        self.make_move()
 
                     elif (self.interaction[1] not in self.can_move_to[self.interaction[0]]) \
                             and ((self.interaction[1] in self.can_hit[self.interaction[0]])
                                  and (self.board_state[self.has_common(self.can_move_to[self.interaction[0]],
                                                                        self.can_move_to[
                                                                            self.interaction[1]])] == State.GREEN)):
-
-                        x = self.has_common(self.can_move_to[self.interaction[0]],
-                                            self.can_move_to[self.interaction[1]])
-                        self.board_state[x] = State.EMPTY
-                        self.board_state[self.interaction[1]] = self.board_state[self.interaction[0]]
-                        self.board_state[self.interaction[0]] = State.EMPTY
-                        self.computer_move()
+                        self.make_hit()
 
                         if self.check_pawn_hits(State.RED, State.GREEN, self.interaction[1]):
                             self.interaction.clear()
                         else:
                             self.red_turn = False
-                            print("Green turn")
                     else:
                         self.interaction.clear()
-                counter=0
-                for x in self.board_state:
-                    if self.board_state[x] == State.GREEN:
-                        counter += 1
-                if counter <= 3:
+                if self.check_win(State.GREEN):
                     self.red_wins = True
 
         elif not self.red_turn: #computer - green
             self.computer_move()
-            counter = 0
-            for x in self.board_state:
-                if self.board_state[x] == State.RED:
-                    counter += 1
-            if counter <= 3:
+            if self.check_win(State.RED):
                 self.green_wins = True
 
     def computer_move(self):
