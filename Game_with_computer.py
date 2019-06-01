@@ -1,5 +1,44 @@
 from Game import State
 
+MAX, MIN = 1000, -1000
+
+def minimax(depth, nodeIndex, maximizingPlayer, values, alpha, beta):
+
+    if depth == 3:
+        return values[nodeIndex]
+
+    if maximizingPlayer:
+
+        best = MIN
+
+        for i in range(0, 2):
+
+            val = minimax(depth + 1, nodeIndex * 2 + i,
+                          False, values, alpha, beta)
+            best = max(best, val)
+            alpha = max(alpha, best)
+
+            if beta <= alpha:
+                break
+
+        return best
+
+    else:
+        best = MAX
+
+        for i in range(0, 2):
+
+            val = minimax(depth + 1, nodeIndex * 2 + i,
+                          True, values, alpha, beta)
+            best = min(best, val)
+            beta = min(beta, best)
+
+            if beta <= alpha:
+                break
+
+        return best
+
+
 class Game_with_computer():
     def __init__(self):
 
@@ -51,6 +90,7 @@ class Game_with_computer():
         self.go_deeper = True
         self.red_wins = False
         self.green_wins = False
+        self.game_over = False
 
         self.can_move_to = {
             1: [2, 6, 7],
@@ -255,11 +295,13 @@ class Game_with_computer():
                         self.interaction.clear()
                 if self.check_win(State.GREEN):
                     self.red_wins = True
+                    self.game_over = True
 
         elif not self.red_turn: #computer - green
             self.computer_move()
             if self.check_win(State.RED):
                 self.green_wins = True
+                self.game_over = True
 
     def computer_move(self):
         computer_pawns=[]
@@ -281,9 +323,14 @@ class Game_with_computer():
                     if self.board_state[i]==State.EMPTY:
                         start_end=[x,i]
                         list_of_possible_moves.append(start_end)
-            self.board_state[list_of_possible_moves[0][0]]=State.EMPTY
-            self.board_state[list_of_possible_moves[0][1]]=State.GREEN
-            self.red_turn=True
+                        #print(minimax(0,0,True,computer_pawns,MIN, MAX))
+                        pion = minimax(0,0,True,computer_pawns,MIN, MAX)
+                        pozycja = self.can_move_to[pion]
+            self.board_state[list_of_possible_moves[0][0]]=State.EMPTY #zabiera pionek z tej pozycji
+            #self.board_state[pion] = State.EMPTY
+            self.board_state[list_of_possible_moves[0][1]]=State.GREEN #ustawia pionek na tą pozycje
+            #self.board_state[] = State.GREEN
+            self.red_turn=True #oddaje ruch przeciwnikowi
 
 
 

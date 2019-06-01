@@ -52,6 +52,9 @@ tps_clock = pygame.time.Clock()
 tps_delta = 0.0
 tps_max = 40.0
 
+game_over = False
+
+
 while True:
     if in_menu:
         background_image = pygame.image.load("Pretwa_menu.png").convert()
@@ -165,6 +168,7 @@ while True:
                     sys.exit(0)  # jeżeli tak, to wyłącza okienko
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                     sys.exit(0)
+
 
 
     pygame.display.flip()  # wyświetla to, co narysowaliśmy
