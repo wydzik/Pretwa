@@ -17,3 +17,5 @@ class Minmax():
 
     def remove_move_from_list(self):
         self.move_list.remove(self.move_list[0])
+
+
