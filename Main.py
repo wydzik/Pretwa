@@ -54,6 +54,7 @@ tps_max = 40.0
 
 game_over = False
 
+game_with_computer.get_minmax_tree(game_with_computer.board_state,8,State.GREEN)
 
 while True:
     if in_menu:
