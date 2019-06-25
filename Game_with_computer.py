@@ -1,44 +1,7 @@
 from Game import State
 from Minmax import Minmax
 
-MAX, MIN = 1000, -1000
-
-def minimax(depth, nodeIndex, maximizingPlayer, values, alpha, beta):
-
-    if depth == 3:
-        return values[nodeIndex]
-
-    if maximizingPlayer:
-
-        best = MIN
-
-        for i in range(0, 2):
-
-            val = minimax(depth + 1, nodeIndex * 2 + i,
-                          False, values, alpha, beta)
-            best = max(best, val)
-            alpha = max(alpha, best)
-
-            if beta <= alpha:
-                break
-
-        return best
-
-    else:
-        best = MAX
-
-        for i in range(0, 2):
-
-            val = minimax(depth + 1, nodeIndex * 2 + i,
-                          True, values, alpha, beta)
-            best = min(best, val)
-            beta = min(beta, best)
-
-            if beta <= alpha:
-                break
-
-        return best
-
+MIN, MAX = 1000, -1000
 
 class Game_with_computer():
     def __init__(self):
@@ -93,6 +56,8 @@ class Game_with_computer():
         self.green_wins = False
         self.game_over = False
 
+        self.Max = -1000
+        self.pos=[]
         self.can_move_to = {
             1: [2, 6, 7],
             2: [1, 3, 8],
@@ -240,7 +205,7 @@ class Game_with_computer():
     def count_pawns(self, list_of_states, checked_state):
         coutner = 0
         for state in list_of_states:
-            if state == checked_state:
+            if list_of_states[state] == checked_state:
                 coutner += 1
         return coutner
 
@@ -262,12 +227,13 @@ class Game_with_computer():
 
 
 
-    def get_minmax_tree(self, list_of_states, depth, actual_state,parent, sum=0):
+    def get_minmax_tree(self, list_of_states, depth, actual_state, parent, sum=0):
         if actual_state == State.GREEN:
             oponent_state = State.RED
         elif actual_state == State.RED:
             oponent_state = State.GREEN
-
+        if parent == 0:
+            depth2=depth.copy()
         possible_hits = self.return_hits_list(list_of_states, actual_state, oponent_state)
         possible_moves = self.return_moves_list(list_of_states,actual_state)
         a=Minmax(depth,list_of_states.copy(),possible_hits,possible_moves,parent)
@@ -278,8 +244,9 @@ class Game_with_computer():
         if depth > 0:
             print("hey")
             if possible_hits != []:
-
                 for hit in a.hit_list:
+                    if depth == depth2:
+                        self.pos = hit
                     self.get_minmax_tree(self.tree_hit(hit,list_of_states.copy() , actual_state,oponent_state), depth-1, oponent_state,a,sum)
                     # if a.parent == 0:
                     #     a.board_state = self.board_state
@@ -287,6 +254,8 @@ class Game_with_computer():
                     #     a.board_state = a.parent.board_state
             if possible_hits == [] and possible_moves != []:
                 for move in a.move_list:
+                    if depth == depth2:
+                        self.pos = move
                     self.get_minmax_tree(self.tree_move(move,list_of_states.copy() , actual_state), depth-1, oponent_state,a, sum)
                     # if a.parent == 0:
                     #     a.board_state = self.board_state
@@ -296,7 +265,20 @@ class Game_with_computer():
                 print('EEEEEEEEEELOOOOOO!')
 
         else:
-            print("shiiit") #tutaj obsługę tego co będzie jak już zrobi gałąż o tej głębokości, jakieś podliczanie tej sumy,
+            print("LISTOFSTATES")
+            print(list_of_states)
+            red_pawns = self.count_pawns(list_of_states,State.RED)
+            print("RED")
+            print(red_pawns)
+            green_pawns = self.count_pawns(list_of_states,State.GREEN)
+            print("Green")
+            print(green_pawns)
+            if green_pawns-red_pawns > self.Max:
+                self.Max = green_pawns - red_pawns
+            print("MAAAAAAAAAAAAX")
+            print(self.Max)
+
+             #tutaj obsługę tego co będzie jak już zrobi gałąż o tej głębokości, jakieś podliczanie tej sumy,
                 # coś takiego chyba. No i wyżej trzeba też jakąś funkcję podliczającą te sumy.
 
     def tree_hit(self, hit_list, list_of_states, actual_state,oponent_state):
