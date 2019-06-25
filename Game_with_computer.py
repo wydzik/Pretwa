@@ -1,4 +1,5 @@
 from Game import State
+from Minmax import Minmax
 
 MAX, MIN = 1000, -1000
 
@@ -134,6 +135,7 @@ class Game_with_computer():
             18: [16, 14, 6, 15],
             19: [7, 8, 9, 10, 11, 12]
         }
+        self.list_of_leafes = []
 
     def has_common(self, a, b):
         for x in a:
@@ -202,7 +204,6 @@ class Game_with_computer():
                         if self.board_state[hit] == opponent_state:
                             return True
         return False
-
     def return_hits_list(self, list_of_states, my_state, opponent_state):
         list_full=[]
         """Sprawdza, które pionki komputera mogą bić w tym ruchu"""
@@ -220,7 +221,7 @@ class Game_with_computer():
 
                         if list_of_states[hit] == opponent_state:
                             list = [position,hit,y] #z position mozna zbic pionek na pozycji hit i przejsc na pozycje y
-                            print(position)
+                            print(list)
                             list_full.append(list)
         return list_full
 
@@ -243,7 +244,7 @@ class Game_with_computer():
                 coutner += 1
         return coutner
 
-    def get_minmax_tree(self, list_of_states, depth, actual_state, sum=0):
+    def get_minmax_tree(self, list_of_states, depth, actual_state,parent, sum=0):
         if actual_state == State.GREEN:
             oponent_state = State.RED
         elif actual_state == State.RED:
@@ -251,16 +252,24 @@ class Game_with_computer():
 
         possible_hits = self.return_hits_list(list_of_states, actual_state, oponent_state)
         possible_moves = self.return_moves_list(list_of_states,actual_state)
-        print(list_of_states)
-
+        a=Minmax(depth,list_of_states,possible_hits,possible_moves,parent)
+        self.list_of_leafes.append(a)
+        print(a.board_state)
+        print(depth)
         if depth > 0:
             print("hey")
             if possible_hits != []:
-                for hit in possible_hits:
-                    self.get_minmax_tree(self.tree_hit(hit, list_of_states, actual_state,oponent_state), depth-1, oponent_state, sum)
-            if possible_hits == []:
-                for move in possible_moves:
-                    self.get_minmax_tree(self.tree_move(move, list_of_states, actual_state), depth-1, oponent_state, sum)
+                for hit in a.hit_list:
+
+                    self.get_minmax_tree(self.tree_hit(hit, a.board_state, actual_state,oponent_state), depth-1, oponent_state,a,sum)
+                    a.board_state=a.parent.board_state
+            if possible_hits == [] and possible_moves != []:
+                for move in a.move_list:
+                    self.get_minmax_tree(self.tree_move(move, a.board_state, actual_state), depth-1, oponent_state,a, sum)
+                    a.board_state= a.parent.board_state
+            if possible_moves == [] and possible_hits == []:
+                print('EEEEEEEEEELOOOOOO!')
+
         else:
             print("shiiit") #tutaj obsługę tego co będzie jak już zrobi gałąż o tej głębokości, jakieś podliczanie tej sumy,
                 # coś takiego chyba. No i wyżej trzeba też jakąś funkcję podliczającą te sumy.
@@ -275,6 +284,7 @@ class Game_with_computer():
         else:
             for hit in hit_list:
                 self.tree_hit(hit, list_of_states,actual_state, oponent_state)
+            return list_of_states
 
     def tree_move(self, move_list, list_of_states, actual_state):
         list_of_states[move_list[0]] = State.EMPTY
