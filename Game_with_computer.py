@@ -244,6 +244,24 @@ class Game_with_computer():
                 coutner += 1
         return coutner
 
+    def get_minmax_tree2(self,list_of_states,depth,actual_state,sum=0):
+        x=[]
+        if actual_state == State.GREEN:
+            oponent_state = State.RED
+        elif actual_state == State.RED:
+            oponent_state = State.GREEN
+        #possible_hits = self.return_hits_list(list_of_states, actual_state)
+        possible_moves = self.return_moves_list(list_of_states, actual_state)
+        y = list_of_states.copy()
+        for move in possible_moves:
+            a=self.tree_move(move,y,actual_state)
+            x.insert(-1,a)
+        print(x[2])
+        print(list_of_states)
+
+
+
+
     def get_minmax_tree(self, list_of_states, depth, actual_state,parent, sum=0):
         if actual_state == State.GREEN:
             oponent_state = State.RED
@@ -252,21 +270,28 @@ class Game_with_computer():
 
         possible_hits = self.return_hits_list(list_of_states, actual_state, oponent_state)
         possible_moves = self.return_moves_list(list_of_states,actual_state)
-        a=Minmax(depth,list_of_states,possible_hits,possible_moves,parent)
+        a=Minmax(depth,list_of_states.copy(),possible_hits,possible_moves,parent)
         self.list_of_leafes.append(a)
-        print(a.board_state)
+        # x=a.board_state.copy()
+        print(list_of_states)
         print(depth)
         if depth > 0:
             print("hey")
             if possible_hits != []:
-                for hit in a.hit_list:
 
-                    self.get_minmax_tree(self.tree_hit(hit, a.board_state, actual_state,oponent_state), depth-1, oponent_state,a,sum)
-                    a.board_state=a.parent.board_state
+                for hit in a.hit_list:
+                    self.get_minmax_tree(self.tree_hit(hit,list_of_states.copy() , actual_state,oponent_state), depth-1, oponent_state,a,sum)
+                    # if a.parent == 0:
+                    #     a.board_state = self.board_state
+                    # else:
+                    #     a.board_state = a.parent.board_state
             if possible_hits == [] and possible_moves != []:
                 for move in a.move_list:
-                    self.get_minmax_tree(self.tree_move(move, a.board_state, actual_state), depth-1, oponent_state,a, sum)
-                    a.board_state= a.parent.board_state
+                    self.get_minmax_tree(self.tree_move(move,list_of_states.copy() , actual_state), depth-1, oponent_state,a, sum)
+                    # if a.parent == 0:
+                    #     a.board_state = self.board_state
+                    # else:
+                    #     a.board_state = a.parent.board_state
             if possible_moves == [] and possible_hits == []:
                 print('EEEEEEEEEELOOOOOO!')
 
@@ -286,7 +311,7 @@ class Game_with_computer():
                 self.tree_hit(hit, list_of_states,actual_state, oponent_state)
             return list_of_states
 
-    def tree_move(self, move_list, list_of_states, actual_state):
+    def tree_move(self, move_list,list_of_states, actual_state):
         list_of_states[move_list[0]] = State.EMPTY
         list_of_states[move_list[1]] = actual_state
         return list_of_states
