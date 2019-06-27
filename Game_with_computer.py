@@ -1,7 +1,8 @@
 from Game import State
 from Minmax import Minmax
 
-MIN, MAX = 1000, -1000
+MAX = -1000
+
 
 class Game_with_computer():
     def __init__(self):
@@ -103,6 +104,7 @@ class Game_with_computer():
         self.list_of_leafes = []
 
     def has_common(self, a, b):
+        """Sprawdza, czy dwie listy mają wspólne pola"""
         for x in a:
             for y in b:
                 if x == y:
@@ -139,6 +141,7 @@ class Game_with_computer():
     def tree_pawn_hits(self, list_of_states, opponent_state, my_position):
         """Sprawdza czy konkretny pionek komputera może wykonać bicie"""
         list_full=[]
+        print("Lista dostępnych bić dla pionka {}".format(my_position))
         for y in self.can_hit[my_position]:
 
             if list_of_states[y] == State.EMPTY:
@@ -147,8 +150,9 @@ class Game_with_computer():
                 position = my_position
                 hit = self.has_common(self.can_move_to[position], self.can_move_to[next_step])
                 if list_of_states[hit] == opponent_state:
+
                     list = [position, hit, y]  # z position mozna zbic pionek na pozycji hit i przejsc na pozycje y
-                    print(position)
+                    print(list)
                     list_full.append(list)
         return list_full
 
@@ -171,8 +175,9 @@ class Game_with_computer():
         return False
 
     def return_hits_list(self, list_of_states, my_state, opponent_state):
-        list_full=[]
         """Sprawdza, które pionki komputera mogą bić w tym ruchu"""
+        list_full = []
+        print("Lista dostępnych bić komputera: ")
         for x in list_of_states:
 
             if list_of_states[x] == my_state:
@@ -186,6 +191,7 @@ class Game_with_computer():
                         hit = self.has_common(self.can_move_to[position], self.can_move_to[next_step])
 
                         if list_of_states[hit] == opponent_state:
+
                             list = [position,hit,y] #z position mozna zbic pionek na pozycji hit i przejsc na pozycje y
                             print(list)
                             list_full.append(list)
@@ -193,10 +199,14 @@ class Game_with_computer():
 
     def return_moves_list(self, list_of_states, my_state):
         """Sprawdza które pionki komputera mogą wykonać ruchy i gdzie"""
-        list_of_moves=[]
+        list_of_moves = []
+        print("Lista dostępnych ruchów dla komputera: ")
         for x in list_of_states:
+
             if list_of_states[x] == my_state:
+
                 for y in self.can_move_to[x]:
+
                     if list_of_states[y] == State.EMPTY:
                         list = [x, y]
                         print(list)
@@ -204,67 +214,63 @@ class Game_with_computer():
         return list_of_moves
 
     def count_pawns(self, list_of_states, checked_state):
-        coutner = 0
+        """Zlicza występowanie pionków danego koloru na planszy"""
+        counter = 0
         for state in list_of_states:
             if list_of_states[state] == checked_state:
-                coutner += 1
-        return coutner
+                counter += 1
+        return counter
 
     def get_minmax_tree(self, list_of_states, depth, actual_state, parent):
+        """Funckja budująca drzewo minmax"""
         if actual_state == State.GREEN:
-            oponent_state = State.RED
+            opponent_state = State.RED
         elif actual_state == State.RED:
-            oponent_state = State.GREEN
-        possible_hits = self.return_hits_list(list_of_states, actual_state, oponent_state)
+            opponent_state = State.GREEN
+        possible_hits = self.return_hits_list(list_of_states, actual_state, opponent_state)
         possible_moves = self.return_moves_list(list_of_states, actual_state)
-        a=Minmax(depth, list_of_states.copy(), possible_hits, possible_moves, parent)
-        self.list_of_leafes.append(a)
-        # x=a.board_state.copy()
-        print(list_of_states)
-        print(depth)
+        leaf = Minmax(depth, list_of_states.copy(), possible_hits, possible_moves, parent)
+        self.list_of_leafes.append(leaf)
         if depth > 0:
-            # print("hey")
             if possible_hits != []:
-                for hit in a.hit_list:
-                    self.get_minmax_tree(self.tree_hit(hit,list_of_states.copy() , actual_state,oponent_state), depth-1, oponent_state,a)
-                    # if a.parent == 0:
-                    #     a.board_state = self.board_state
-                    # else:
-                    #     a.board_state = a.parent.board_state
+                for hit in leaf.hit_list:
+                    self.get_minmax_tree(self.tree_hit(hit, list_of_states.copy(), actual_state, opponent_state),
+                                         depth-1, opponent_state, leaf)
+
             if possible_hits == [] and possible_moves != []:
-                for move in a.move_list:
-                    self.get_minmax_tree(self.tree_move(move,list_of_states.copy() , actual_state), depth-1, oponent_state,a)
-                    # if a.parent == 0:
-                    #     a.board_state = self.board_state
-                    # else:
-                    #     a.board_state = a.parent.board_state
+                for move in leaf.move_list:
+                    self.get_minmax_tree(self.tree_move(move, list_of_states.copy(), actual_state),
+                                         depth-1, opponent_state, leaf)
             if possible_moves == [] and possible_hits == []:
-                print('EEEEEEEEEELOOOOOO!')
+                red_pawns = self.count_pawns(list_of_states, State.RED)
+                green_pawns = self.count_pawns(list_of_states, State.GREEN)
+                if green_pawns - red_pawns > self.Max:
+                    self.Max = green_pawns - red_pawns
+                    while leaf.parent.parent != 0:
+                        leaf = leaf.parent
+                    self.pos = leaf.board_state
+                print("Wartość maksymalnej ścieżki:")
+                print(self.Max)
+                print("Układ planszy w następnym ruchu dla maksymalnej ścieżki:")
+                for position in self.pos:
+                    print("{}: {}".format(position,self.pos[position]))
 
         else:
-            # print("LISTOFSTATES")
-            # print(list_of_states)
-            red_pawns = self.count_pawns(list_of_states,State.RED)
-            # print("RED")
-            # print(red_pawns)
-            green_pawns = self.count_pawns(list_of_states,State.GREEN)
-            # print("Green")
-            # print(green_pawns)
-
+            red_pawns = self.count_pawns(list_of_states, State.RED)
+            green_pawns = self.count_pawns(list_of_states, State.GREEN)
             if green_pawns-red_pawns > self.Max:
                 self.Max = green_pawns - red_pawns
-
-                while a.parent.parent != 0:
-                    a=a.parent
-                self.pos = a.board_state
-            print("MAAAAAAAAAAAAX")
-            print(self.pos)
-            # print(self.Max)
-
-             #tutaj obsługę tego co będzie jak już zrobi gałąż o tej głębokości, jakieś podliczanie tej sumy,
-                # coś takiego chyba. No i wyżej trzeba też jakąś funkcję podliczającą te sumy.
+                while leaf.parent.parent != 0:
+                    leaf=leaf.parent
+                self.pos = leaf.board_state
+            print("Wartość maksymalnej ścieżki:")
+            print(self.Max)
+            print("Układ planszy w następnym ruchu dla maksymalnej ścieżki:")
+            for position in self.pos:
+                print("{}: {}".format(position,self.pos[position]))
 
     def tree_hit(self, hit_list, list_of_states, actual_state,oponent_state):
+        """Wykonanie bicia wewnątrz drzewa minmax"""
         list_of_states[hit_list[0]] = State.EMPTY
         list_of_states[hit_list[1]] = State.EMPTY
         list_of_states[hit_list[2]] = actual_state
@@ -277,11 +283,13 @@ class Game_with_computer():
             return list_of_states
 
     def tree_move(self, move_list,list_of_states, actual_state):
+        """Wykonanie ruchu wewnątrz drzewa minmax"""
         list_of_states[move_list[0]] = State.EMPTY
         list_of_states[move_list[1]] = actual_state
         return list_of_states
 
     def check_win(self, checked_state):
+        """Sprawdzenie, czy zachodzi warunek zwycięstwa"""
         counter = 0
         for x in self.board_state:
             if self.board_state[x] == checked_state:
@@ -292,19 +300,21 @@ class Game_with_computer():
             return False
 
     def make_hit(self):
+        """Wykonywanie bicia przez gracza"""
         hit_pawn = self.has_common(self.can_move_to[self.interaction[0]], self.can_move_to[self.interaction[1]])
         self.board_state[hit_pawn] = State.EMPTY
         self.board_state[self.interaction[1]] = self.board_state[self.interaction[0]]
         self.board_state[self.interaction[0]] = State.EMPTY
 
     def make_move(self):
+        """Wykonywanie ruchu przez gracza"""
         self.board_state[self.interaction[1]] = self.board_state[self.interaction[0]]
         self.board_state[self.interaction[0]] = State.EMPTY
         self.red_turn = not self.red_turn
         self.interaction.clear()
 
     def add_to_interaction(self, pos):
-
+        """Obsługa ruchu gracza"""
         if self.red_turn:
 
             if (len(self.interaction)) == 0 and self.board_state[pos] == State.RED: # pierwsze klikniete pole przez usera nie moze byc puste
@@ -367,7 +377,11 @@ class Game_with_computer():
                 self.game_over = True
 
     def computer_move(self):
-        self.get_minmax_tree(self.board_state,3,State.GREEN,0)
+        """Obsługa ruchu komputera"""
+        self.get_minmax_tree(self.board_state,5,State.GREEN,0)
+        self.board_state= self.pos
+        self.Max = -100
+        self.red_turn=True #oddaje ruch przeciwnikowi
         # computer_pawns=[]
         # for i in range(1, 20, 1):
         #     if (self.board_state[i]) == State.GREEN:
@@ -390,10 +404,7 @@ class Game_with_computer():
         #             if self.board_state[i]==State.EMPTY:
         #                 start_end=[x,i]
         #                 list_of_possible_moves.append(start_end)
-        self.board_state= self.pos
-        self.Max = -100
-        # self.board_state[list_of_possible_moves[0][1]]=State.GREEN #ustawia pionek na tą pozycje
-        self.red_turn=True #oddaje ruch przeciwnikowi
+        #                 self.board_state[list_of_possible_moves[0][1]]=State.GREEN #ustawia pionek na tą pozycje
 
 
 

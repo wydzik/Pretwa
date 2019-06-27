@@ -3,6 +3,7 @@ import cv2
 import os
 from Game import *
 from Game_with_computer import *
+import time
 
 pygame.init()
 _image_library = {}
@@ -53,8 +54,6 @@ tps_delta = 0.0
 tps_max = 40.0
 
 game_over = False
-# game_with_computer.get_minmax_tree(game_with_computer.board_state,8,State.RED,0)
-
 while True:
     if in_menu:
         background_image = pygame.image.load("Pretwa_menu.png").convert()
@@ -74,6 +73,8 @@ while True:
                         and (event.pos[1] >= 250)\
                         and (event.pos[1] <= 350):
                    in_menu = False
+                   game_with_computer = Game_with_computer()
+                   game = Game()
                    background_image = pygame.image.load("PretwaBoard.png").convert()
 
                 elif (event.pos[0] >= 100)\
@@ -81,6 +82,8 @@ while True:
                         and (event.pos[1] >= 400)\
                         and (event.pos[1] <= 500):
                     in_menu = False
+                    game_with_computer = Game_with_computer()
+                    game = Game()
                     background_image = pygame.image.load("PretwaBoard.png").convert()
                     with_player=False
 
@@ -149,14 +152,14 @@ while True:
 
         if game.green_wins or game_with_computer.green_wins:
             background_image = pygame.image.load("Pretwa_green_wins.png").convert()
-            for event in pygame.event.get():  # przechwytuje jakieś zdarzenia, tylko trzeba rozróżnić że
-                # np. każde kliknięcie to osobny event
-                # ale kliknięcie i trzymanie to już tylko jeden event
+            for event in pygame.event.get():
 
                 if event.type == pygame.QUIT:  # sprawdza, czy tym zdarzeniem było kliknięcie X
                     sys.exit(0)  # jeżeli tak, to wyłącza okienko
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                     sys.exit(0)
+                elif event.type == pygame.KEYDOWN and event.key ==pygame.K_KP_PLUS:
+                    in_menu = True
 
         if game.red_wins or game_with_computer.red_wins:
             background_image = pygame.image.load("Pretwa_red_wins.png").convert()
@@ -168,7 +171,8 @@ while True:
                     sys.exit(0)  # jeżeli tak, to wyłącza okienko
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                     sys.exit(0)
-
+                elif event.type == pygame.KEYDOWN and event.key ==pygame.K_KP_PLUS:
+                    in_menu = True
 
 
     pygame.display.flip()  # wyświetla to, co narysowaliśmy

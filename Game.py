@@ -156,6 +156,7 @@ class Game():
         return False
 
     def check_win(self, checked_state):
+        """Sprawdzenie, czy zachodzi warunek zwycięstwa"""
         counter = 0
         for x in self.board_state:
             if self.board_state[x] == checked_state:
@@ -166,19 +167,21 @@ class Game():
             return False
 
     def make_hit(self):
+        """Wykonanie bicia przez gracza"""
         hit_pawn = self.has_common(self.can_move_to[self.interaction[0]], self.can_move_to[self.interaction[1]])
         self.board_state[hit_pawn] = State.EMPTY
         self.board_state[self.interaction[1]] = self.board_state[self.interaction[0]]
         self.board_state[self.interaction[0]] = State.EMPTY
 
     def make_move(self):
+        """Wykonanie ruchu przez gracza"""
         self.board_state[self.interaction[1]] = self.board_state[self.interaction[0]]
         self.board_state[self.interaction[0]] = State.EMPTY
         self.red_turn = not self.red_turn
         self.interaction.clear()
 
     def add_to_interaction(self, pos):
-
+        """Obsługa ruchów gracza"""
         if self.red_turn:
 
             if (len(self.interaction)) == 0 and self.board_state[pos] == State.RED: # pierwsze klikniete pole przez usera nie moze byc puste
